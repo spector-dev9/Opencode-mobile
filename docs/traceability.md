@@ -9,7 +9,7 @@ corresponding Android service exists. G0 decisions use the separate IDs in
 | Plan item | Current evidence | Status | Remaining acceptance |
 | --- | --- | --- | --- |
 | D1: refactor the existing Kotlin/Compose architecture | `app/` is a minimal Compose shell; `core/model` and `core/opencode-client` now contain pure Kotlin models and an authenticated HTTP/SSE client | In progress | Continue the staged migration; Android app wiring and device acceptance remain pending |
-| D2: native Jetpack Compose UI | `app/src/main/kotlin/` contains the Compose entry point and license screen | Scaffold | Implement feature screens after the architecture and runtime gates are resolved |
+| D2: native Jetpack Compose UI | `app/src/main/kotlin/` now contains the native Compose shell, sessions, chat, workspace preview, settings/theme, and blocked terminal screens; debug builds use isolated demo services and release fails closed | Implemented against demo and shared contracts; production service wiring remains gated | Wire the runtime-owned `ChatRepository` and `WorkspaceService` implementations after G0, then run device acceptance for streaming, permissions, file preview, and lifecycle |
 | D3: Alpine/PRoot runtime, arm64 primary | Runtime manifest (PRoot 5.1.107.100), host/device harness evidence, and `core/runtime` validation plus an atomic verified-artifact installation boundary exist; strict OpenCode extraction is implemented, while Alpine extraction and process launch remain platform boundaries | Host implementation and partial device feasibility only | Implement and wire safe Alpine/rootfs extraction and a native-library launcher; verify complete packaging, startup, and ABI behavior on physical devices |
 | D4: pinned official OpenCode musl binary; optional user toolchains | `runtime/manifest.json` pins the official 1.19.3 ARM64 musl archive and extracted binary hashes plus Alpine runtime libraries; readiness and staging verify the binary digest; the installer has a strict single-executable tar.gz extractor | Archive and executable integrity checks plus an isolated install transaction exist; production wiring and full runtime-content verification remain incomplete | Integrate the installer, validate all installed runtime contents against trusted metadata, and verify installation/update behavior on target devices |
 | D5: authenticated HTTP plus SSE | Pinned OpenAPI 1.19.3 snapshot, Node fixtures, and `core/opencode-client` with `/session/*/prompt_async`, `/event`, Basic auth, typed responses, and reconnecting SSE | Kotlin client extracted; app/service wiring pending | Wire through the application service boundary and verify authenticated SSE recovery in the app and on target devices |
@@ -29,6 +29,12 @@ corresponding Android service exists. G0 decisions use the separate IDs in
 - Focused runtime/model/client Kotlin tests and `coreCheck` passed on JDK 21.
   `:app:assembleDebug` also passed on JDK 21. These are host build results,
   not emulator or physical-device runs.
+- UI unit tests (`TranscriptStore`, chat/sessions/workspace view models,
+  presentation, markdown, and formatting) and `:app:assembleDebug` passed on
+  JDK 21. The debug APK contains the adaptive launcher icon. Debug builds use
+  labelled demo data; release builds return `E_RUNTIME_DOWN` until the runtime
+  owner supplies real services. No UI device or emulator acceptance run was
+  performed.
 - The runtime implementation currently validates manifest shape and required
   files only. The pinned manifest hashes the downloadable archive, not each
   extracted runtime file; runtime installation/content verification and the

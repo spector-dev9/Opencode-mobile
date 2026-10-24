@@ -39,6 +39,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     sourceSets["main"].assets.srcDir(generatedLicensesDir)
@@ -49,6 +50,11 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":core:common-api"))
+    implementation(project(":core:gateway-api"))
+    implementation(project(":core:model"))
+    implementation(project(":core:workspace-api"))
+
     testImplementation(project(":core:bridge-api"))
     testImplementation(project(":core:common-api"))
     testImplementation(project(":core:diagnostics-api"))
@@ -61,11 +67,21 @@ dependencies {
     testImplementation(project(":core:workspace-api"))
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.compose.bom))
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.compose.ui.tooling.preview)
+
+    debugImplementation(libs.compose.ui.tooling)
 
     testImplementation(kotlin("test"))
     testImplementation(libs.junit.jupiter)
+    testImplementation(libs.kotlinx.coroutines.test)
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
